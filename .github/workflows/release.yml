@@ -7,6 +7,11 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
 jobs:
   release:
     name: Release
@@ -43,6 +48,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm for trusted publishing (OIDC)
+        run: npm i -g npm@11.5.1
 
       - name: Install and prepare
         run: pnpm install --frozen-lockfile --strict-peer-dependencies
@@ -54,4 +63,3 @@ jobs:
           publish: pnpm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
